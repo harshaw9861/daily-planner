@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<!-- This line tells the browser "this is a modern HTML page" -->
+<html lang="en">
+<head>
+  <!-- Everything in <head> is invisible on the page itself. -->
+  <!-- It's information ABOUT the page, not content on it. -->
+
+  <meta charset="UTF-8" />
+  <!-- This lets the page correctly show letters, symbols, emojis, etc. -->
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- This makes the page resize nicely on phones later. -->
+
+  <title>My Calendar &amp; Daily Planner</title>
+  <!-- This text shows up in the browser tab. -->
+
+  <link rel="stylesheet" href="style.css" />
+  <!-- This line connects our CSS file so the page gets its styling. -->
+
+  <link rel="manifest" href="manifest.json" />
+  <!-- This tells phones "this page can be installed as an app". -->
+
+  <meta name="theme-color" content="#0F766E" />
+  <!-- Colors the phone's status bar to match the app when installed. -->
+
+  <link rel="icon" href="icon-192.png" />
+</head>
+
+<body>
+  <!-- Everything inside <body> IS visible on the page. -->
+
+  <header class="app-header">
+    <h1 class="app-title">Daily Planner</h1>
+    <p id="today-date" class="today-date">Loading date...</p>
+    <!-- We gave this <p> the id "today-date" so JavaScript can find it
+         and fill in today's real date later. -->
+  </header>
+
+  <main class="app-main">
+    <!-- This will hold the calendar (month view) -->
+    <section id="calendar-panel" class="panel">
+      <div class="calendar-header">
+        <button id="prev-month" class="nav-btn" aria-label="Previous month">&#8249;</button>
+        <span id="month-year-label" class="month-year-label"></span>
+        <button id="next-month" class="nav-btn" aria-label="Next month">&#8250;</button>
+      </div>
+      <div id="calendar-grid" class="calendar-grid"></div>
+      <!-- calendar-grid starts empty; script.js fills it in with JavaScript -->
+    </section>
+
+    <!-- This will hold the list of tasks/events for the selected day -->
+    <section id="planner-panel" class="panel">
+      <h2>Plan for <span id="selected-date-label"></span></h2>
+
+      <div class="task-input-row">
+        <input type="text" id="task-input" placeholder="Add a task..." />
+        <button id="add-task-btn">Add</button>
+      </div>
+
+      <ul id="task-list" class="task-list"></ul>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+  <!-- This connects our JavaScript file. It's placed at the bottom
+       so the page's HTML loads first, before JS tries to touch it. -->
+
+  <script>
+    // Turns on offline support, but only works when hosted online (not
+    // when opened as a local file), so we check first to avoid errors.
+    if ("serviceWorker" in navigator && location.protocol !== "file:") {
+      navigator.serviceWorker.register("service-worker.js");
+    }
+  </script>
+</body>
+</html>
