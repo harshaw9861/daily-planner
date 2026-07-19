@@ -219,3 +219,132 @@ taskInput.addEventListener("keydown", (event) => {
 // ============================================
 renderCalendar();
 renderPlanner();
+
+// ============================================
+// STEP 3: SWIPE GESTURES, REMINDERS, EXPORT/IMPORT
+// ============================================
+
+// ---------- SWIPE LEFT/RIGHT TO CHANGE MONTH ----------
+let touchStartX = 0;
+
+calendarGrid.addEventListener("touchstart", (event) => {
+  touchStartX = event.changedTouches[0].screenX; // where the finger first touched
+});
+
+calendarGrid.addEventListener("touchend", (event) => {
+  const touchEndX = event.changedTouches[0].screenX; // where the finger lifted off
+  const distance = touchEndX - touchStartX;
+  const minSwipeDistance = 50; // ignore tiny accidental movements
+
+  if (distance > minSwipeDistance) {
+    // swiped right (finger moved left-to-right) -> go to previous month
+    viewDate.setMonth(viewDate.getMonth() - 1);
+    renderCalendar();
+  } else if (distance < -minSwipeDistance) {
+    // swiped left (finger moved right-to-left) -> go to next month
+    viewDate.setMonth(viewDate.getMonth() + 1);
+    renderCalendar();
+  }
+});
+
+// ---------- REMINDERS (shown only while the app is open) ----------
+const enableRemindersBtn = document.getElementById("enable-reminders-btn");
+const reminderStatus = document.getElementById("reminder-status");
+
+function updateReminderStatusText() {
+  if (Notification.permission === "granted") {
+    reminderStatus.textContent = "Reminders are ON.";
+  } else if (Notification.permission === "denied") {
+    reminderStatus.textContent = "Reminders are blocked in your browser settings.";
+  } else {
+    reminderStatus.textContent = "Reminders are OFF.";
+  }
+}
+
+function checkTodaysTasksAndNotify() {
+  if (Notification.permission !== "granted") return;
+
+  const todaysTasks = getTasksForDate(new Date());
+  const unfinished = todaysTasks.filter((t) => !t.done);
+
+  if (unfinished.length > 0) {
+    new Notification("Life Planner", {
+      body: `You have ${unfinished.length} task(s) left for today.`,
+      icon: "icon-192.png",
+    });
+  }
+}
+
+enableRemindersBtn.addEventListener("click", () => {
+  if (!("Notification" in window)) {
+    reminderStatus.textContent = "Your browser doesn't support notifications.";
+    return;
+  }
+  Notification.requestPermission().then(() => {
+    updateReminderStatusText();
+    checkTodaysTasksAndNotify(); // give one right away as a test
+  });
+});
+
+// If permission was already granted on a previous visit, check right away.
+if ("Notification" in window) {
+  updateReminderStatusText();
+  if (Notification.permission === "granted") {
+    checkTodaysTasksAndNotify();
+  }
+}
+
+// ---------- EXPORT DATA (save all tasks to a downloadable file) ----------
+document.getElementById("export-btn").addEventListener("click", () => {
+  const allData = {};
+
+  // Go through every key saved in Local Storage...
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    // ...and only grab the ones that belong to our planner's tasks.
+    if (key.startsWith("tasks-")) {
+      allData[key] = JSON.parse(localStorage.getItem(key));
+    }
+  }
+
+  // Turn that data into a downloadable file.
+  const fileContent = JSON.stringify(allData, null, 2);
+  const blob = new Blob([fileContent], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "life-planner-backup.json";
+  link.click();
+
+  URL.revokeObjectURL(url); // cleans up memory
+});
+
+// ---------- IMPORT DATA (load tasks from a previously exported file) ----------
+const importBtn = document.getElementById("import-btn");
+const importFileInput = document.getElementById("import-file-input");
+
+importBtn.addEventListener("click", () => {
+  importFileInput.click(); // opens the phone/computer's file picker
+});
+
+importFileInput.addEventListener("change", (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const importedData = JSON.parse(reader.result);
+      // Write each imported day's tasks back into Local Storage.
+      Object.keys(importedData).forEach((key) => {
+        localStorage.setItem(key, JSON.stringify(importedData[key]));
+      });
+      renderPlanner(); // refresh the screen to show imported tasks
+      alert("Import complete!");
+    } catch (err) {
+      alert("That file couldn't be read. Make sure it's a Life Planner backup file.");
+    }
+  };
+  reader.readAsText(file);
+});

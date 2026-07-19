@@ -11,7 +11,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <!-- This makes the page resize nicely on phones later. -->
 
-  <title>My Calendar &amp; Daily Planner</title>
+  <title>Life Planner</title>
   <!-- This text shows up in the browser tab. -->
 
   <link rel="stylesheet" href="style.css" />
@@ -30,7 +30,7 @@
   <!-- Everything inside <body> IS visible on the page. -->
 
   <header class="app-header">
-    <h1 class="app-title">Daily Planner</h1>
+    <h1 class="app-title">Life Planner</h1>
     <p id="today-date" class="today-date">Loading date...</p>
     <!-- We gave this <p> the id "today-date" so JavaScript can find it
          and fill in today's real date later. -->
@@ -58,6 +58,20 @@
       </div>
 
       <ul id="task-list" class="task-list"></ul>
+    </section>
+
+    <!-- A small settings area for reminders and moving your data between devices -->
+    <section id="settings-panel" class="panel settings-panel">
+      <h2>Settings</h2>
+      <button id="enable-reminders-btn" class="secondary-btn">Enable Reminders</button>
+      <p id="reminder-status" class="placeholder-text"></p>
+
+      <div class="settings-row">
+        <button id="export-btn" class="secondary-btn">Export Data</button>
+        <button id="import-btn" class="secondary-btn">Import Data</button>
+        <input type="file" id="import-file-input" accept=".json" style="display:none" />
+      </div>
+      <p class="placeholder-text">Export saves a file with all your tasks. Import loads that file on another device.</p>
     </section>
   </main>
 

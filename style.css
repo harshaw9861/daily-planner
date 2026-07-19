@@ -259,3 +259,31 @@ body {
 .delete-btn:hover {
   color: #DC2626;
 }
+
+/* ============================================
+   10. SETTINGS PANEL
+   ============================================ */
+.settings-panel {
+  grid-column: 1 / -1; /* makes this box span both columns, full width */
+  margin-top: 4px;
+}
+
+.secondary-btn {
+  background-color: var(--color-accent-light);
+  color: var(--color-accent);
+  border: none;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 14px;
+  cursor: pointer;
+  margin-right: 8px;
+}
+
+.secondary-btn:hover {
+  background-color: var(--color-accent);
+  color: white;
+}
+
+.settings-row {
+  margin: 10px 0;
+}
